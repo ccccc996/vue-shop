@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    hello vue
+    <router-view></router-view>
   </div>
 </template>
 
@@ -9,5 +9,3 @@ export default {
   name: 'app'
 }
 </script>
-
-<style></style>
