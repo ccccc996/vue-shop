@@ -2,10 +2,9 @@
   <div>
     <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ path: '/welcome' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>活动管理</el-breadcrumb-item>
       <el-breadcrumb-item>活动列表</el-breadcrumb-item>
-      <el-breadcrumb-item>活动详情</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 卡片视图区域 -->
     <el-card>
@@ -25,7 +24,33 @@
 </template>
 
 <script>
-export default {}
+export default {
+  data() {
+    return {
+      queryInfo: {
+        query: '',
+        pagenum: 1,
+        pagesize: 2
+      },
+      userlist: [],
+      total: 0
+    }
+  },
+  created() {
+    this.getUserList()
+  },
+  methods: {
+    async getUserList() {
+      const { data: res } = await this.$http.get('users', {
+        params: this.queryInfo
+      })
+      console.log(res)
+      if (res.meta.status !== 200) return this.$message.error('获取用户列表失败')
+      this.userlist = res.data.users
+      this.total = res.data.total
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped></style>
