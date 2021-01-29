@@ -72,8 +72,8 @@ export default {
       this.$refs.loginFormRef.validate(async (valid) => {
         if (!valid) return
         const { data } = await this.$http.post('login', this.loginForm)
-        if (data.meta.status !== 200) return console.log('登陆失败')
-        console.log('登陆成功')
+        if (data.meta.status !== 200) return this.$message.error('登陆失败')
+        this.$message.success('登陆成功')
       })
     }
   }
