@@ -74,6 +74,9 @@ export default {
         const { data } = await this.$http.post('login', this.loginForm)
         if (data.meta.status !== 200) return this.$message.error('登陆失败')
         this.$message.success('登陆成功')
+        // 存储 token 值
+        window.sessionStorage.setItem('token', data.data.token)
+        this.$router.push('/home')
       })
     }
   }
