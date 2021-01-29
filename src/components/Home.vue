@@ -13,21 +13,21 @@
       <!-- 侧边栏 -->
       <el-aside width="200px">
         <!-- 侧边栏菜单区域 -->
-        <el-menu background-color="#333744" text-color="#fff" active-text-color="#ffd04b">
+        <el-menu background-color="#333744" text-color="#fff" active-text-color="#409eff">
           <!-- 一级菜单 -->
-          <el-submenu :index="item.id" v-for="item in menulist" :key="item.id">
+          <el-submenu :index="item.id + ''" v-for="item in menulist" :key="item.id">
             <!-- 一级菜单的模板区域 -->
             <template slot="title">
               <!-- 图标 -->
-              <i class="el-icon-location"></i>
+              <i :class="iconObj[item.id]"></i>
               <!-- 文本 -->
               <span>{{ item.authName }}</span>
             </template>
             <!-- 二级菜单 -->
-            <el-menu-item :index="subitem.id" v-for="subitem in item.children" :key="subitem.id">
+            <el-menu-item :index="subitem.id + ''" v-for="subitem in item.children" :key="subitem.id">
               <template slot="title">
                 <!-- 图标 -->
-                <i class="el-icon-location"></i>
+                <i class="el-icon-menu"></i>
                 <!-- 文本 -->
                 <span>{{ subitem.authName }}</span>
               </template>
@@ -45,7 +45,14 @@
 export default {
   data() {
     return {
-      menulist: []
+      menulist: [],
+      iconObj: {
+        '125': 'iconfont icon-user',
+        '103': 'iconfont icon-tijikongjian',
+        '101': 'iconfont icon-shangpin',
+        '102': 'iconfont icon-danju',
+        '145': 'iconfont icon-baobiao'
+      }
     }
   },
   created() {
@@ -90,5 +97,9 @@ export default {
 }
 .el-main {
   background-color: #eaedf1;
+}
+
+.iconfont {
+  margin-right: 10px;
 }
 </style>
