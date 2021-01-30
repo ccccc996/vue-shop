@@ -11,8 +11,8 @@
       <!-- 搜索与添加区域 -->
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-input placeholder="请输入内容">
-            <el-button slot="append" icon="el-icon-search"></el-button>
+          <el-input placeholder="请输入内容" v-model="queryInfo.query" clearable @clear="getUserList">
+            <el-button slot="append" icon="el-icon-search" @click="getUserList"></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
@@ -87,6 +87,7 @@ export default {
     async userStateChanged(userinfo) {
       const { data: res } = await this.$http.put(`users/${userinfo.id}/state/${userinfo.mg_state}`)
       if (res.meta.status !== 200) {
+        // 修改失败则需要把用户状态信息恢复到之前的状态
         userinfo.mg_state = !userinfo.mg_state
         this.$message.error('更新用户信息失败')
       }
