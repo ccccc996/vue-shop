@@ -32,10 +32,11 @@
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180px">
-          <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
-          <el-button type="danger" icon="el-icon-share" size="mini"></el-button>
+          <!-- 修改 -->
+          <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog()"></el-button>
+          <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
           <el-tooltip class="item" effect="dark" content="分配角色" placement="top">
-            <el-button type="warning" icon="el-icon-delete" size="mini"></el-button>
+            <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
           </el-tooltip>
         </el-table-column>
       </el-table>
@@ -43,6 +44,7 @@
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryInfo.pagenum" :page-sizes="[1, 2, 5, 10]" :page-size="queryInfo.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total"></el-pagination>
     </el-card>
     <!-- 弹框区域 -->
+    <!-- 添加用户 -->
     <el-dialog title="提示" :visible.sync="addDialogVisible" width="50%" @close="addDialogClose">
       <!-- 弹框表单 -->
       <el-form ref="addFormRef" :model="addForm" :rules="addFormRules" label-width="70px">
@@ -62,6 +64,26 @@
       <span slot="footer" class="dialog-footer">
         <el-button @click="addDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="addUsers">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 编辑用户 -->
+    <el-dialog title="提示" :visible.sync="editDialogVisible" width="50%">
+      <!-- 弹框表单 -->
+      <!-- <el-form ref="editFormRef" :model="editForm" :rules="editFormRules" label-width="70px">
+        <el-form-item label="用户名">
+          <el-input v-model="editForm.username" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="editForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="电话" prop="mobile">
+          <el-input v-model="editForm.mobile"></el-input>
+        </el-form-item>
+      </el-form> -->
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editDialogVisible = false">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -121,7 +143,10 @@ export default {
           { required: true, message: '请输入手机', trigger: 'blur' },
           { validator: checkMobile, trigger: 'blur' }
         ]
-      }
+      },
+      editDialogVisible: false,
+      editForm: {},
+      editFormRules: {}
     }
   },
   created() {
@@ -167,6 +192,9 @@ export default {
         this.addDialogVisible = false
         this.getUserList()
       })
+    },
+    showEditDialog() {
+      this.editDialogVisible = true
     }
   }
 }
