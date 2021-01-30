@@ -7,7 +7,7 @@
 <script>
 import hub from '../utils/hub'
 export default {
-  name: Welcome,
+  name: 'Welcome',
   created() {
     hub.$emit('saveNavState', '')
   }
