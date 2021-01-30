@@ -46,8 +46,8 @@
     <el-dialog title="提示" :visible.sync="addDialogVisible" width="50%" @close="addDialogClose">
       <!-- 弹框表单 -->
       <el-form ref="addFormRef" :model="addForm" :rules="addFormRules" label-width="70px">
-        <el-form-item label="用户名" prop="name">
-          <el-input v-model="addForm.name"></el-input>
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="addForm.username"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
           <el-input v-model="addForm.password"></el-input>
@@ -61,7 +61,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="addDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addDialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="addUsers">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -99,13 +99,13 @@ export default {
       total: 0,
       addDialogVisible: false,
       addForm: {
-        name: '',
+        username: '',
         password: '',
         email: '',
         mobile: ''
       },
       addFormRules: {
-        name: [
+        username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
           { min: 3, max: 10, message: '长度在 3 到 10 个字符之间', trigger: 'blur' }
         ],
@@ -155,8 +155,18 @@ export default {
       }
       this.$message.success('更新用户信息成功')
     },
-    addDialogClose(){
+    addDialogClose() {
       this.$refs.addFormRef.resetFields()
+    },
+    addUsers() {
+      this.$refs.addFormRef.validate(async (valid) => {
+        if (!valid) return false
+        const { data: res } = await this.$http.post('users', this.addForm)
+        if (res.meta.status !== 201) return this.$message.error('添加用户失败')
+        this.$message.success('添加用户成功')
+        this.addDialogVisible = false
+        this.getUserList()
+      })
     }
   }
 }
