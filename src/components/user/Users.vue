@@ -32,17 +32,20 @@
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180px">
-          <!-- 修改 -->
-          <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog()"></el-button>
-          <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
-          <el-tooltip class="item" effect="dark" content="分配角色" placement="top">
-            <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
-          </el-tooltip>
+          <template slot-scope="scope">
+            <!-- 修改 -->
+            <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row.id)"></el-button>
+            <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+            <el-tooltip class="item" effect="dark" content="分配角色" placement="top">
+              <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+            </el-tooltip>
+          </template>
         </el-table-column>
       </el-table>
       <!-- 分页区域 -->
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryInfo.pagenum" :page-sizes="[1, 2, 5, 10]" :page-size="queryInfo.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total"></el-pagination>
     </el-card>
+
     <!-- 弹框区域 -->
     <!-- 添加用户 -->
     <el-dialog title="提示" :visible.sync="addDialogVisible" width="50%" @close="addDialogClose">
@@ -70,7 +73,7 @@
     <!-- 编辑用户 -->
     <el-dialog title="提示" :visible.sync="editDialogVisible" width="50%">
       <!-- 弹框表单 -->
-      <!-- <el-form ref="editFormRef" :model="editForm" :rules="editFormRules" label-width="70px">
+      <el-form ref="editFormRef" :model="editForm" :rules="editFormRules" label-width="70px">
         <el-form-item label="用户名">
           <el-input v-model="editForm.username" disabled></el-input>
         </el-form-item>
@@ -80,7 +83,7 @@
         <el-form-item label="电话" prop="mobile">
           <el-input v-model="editForm.mobile"></el-input>
         </el-form-item>
-      </el-form> -->
+      </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="editDialogVisible = false">确 定</el-button>
@@ -193,7 +196,11 @@ export default {
         this.getUserList()
       })
     },
-    showEditDialog() {
+    async showEditDialog(id) {
+      // console.log(id)
+      const { data: res } = await this.$http.get('users/' + id)
+      if (res.meta.status !== 200) return this.$message.error('获取用户信息失败')
+      this.editForm = res.data
       this.editDialogVisible = true
     }
   }
