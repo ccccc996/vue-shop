@@ -43,7 +43,7 @@
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryInfo.pagenum" :page-sizes="[1, 2, 5, 10]" :page-size="queryInfo.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total"></el-pagination>
     </el-card>
     <!-- 弹框区域 -->
-    <el-dialog title="提示" :visible.sync="addDialogVisible" width="30%">
+    <el-dialog title="提示" :visible.sync="addDialogVisible" width="50%" @close="addDialogClose">
       <!-- 弹框表单 -->
       <el-form ref="addFormRef" :model="addForm" :rules="addFormRules" label-width="70px">
         <el-form-item label="用户名" prop="name">
@@ -154,6 +154,9 @@ export default {
         this.$message.error('更新用户信息失败')
       }
       this.$message.success('更新用户信息成功')
+    },
+    addDialogClose(){
+      this.$refs.addFormRef.resetFields()
     }
   }
 }
