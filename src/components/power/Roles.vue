@@ -8,7 +8,17 @@
     </el-breadcrumb>
     <!-- 卡片视图区域 -->
     <el-card>
-      123
+      <el-table :data="rolesList" border stripe>
+        <el-table-column type="expand"></el-table-column>
+        <el-table-column type="index"></el-table-column>
+        <el-table-column label="角色名称" prop="roleName"></el-table-column>
+        <el-table-column label="角色描述" prop="roleDesc"></el-table-column>
+        <el-table-column label="操作">
+          <el-button size="mini" type="primary" icon="el-icon-edit">编辑</el-button>
+          <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
+          <el-button size="mini" type="warning" icon="el-icon-setting">分配权限</el-button>
+        </el-table-column>
+      </el-table>
     </el-card>
   </div>
 </template>
@@ -28,7 +38,7 @@ export default {
       const { data: res } = await this.$http.get('roles')
       if (res.meta.status !== 200) return this.$message.error('获取角色信息失败')
       this.rolesList = res.data
-      console.log(this.rolesList)
+      // console.log(this.rolesList)
     }
   }
 }
