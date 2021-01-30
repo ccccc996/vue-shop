@@ -5,7 +5,13 @@
 </template>
 
 <script>
-export default {}
+import hub from '../utils/hub'
+export default {
+  name: Welcome,
+  created() {
+    hub.$emit('saveNavState', '')
+  }
+}
 </script>
 
 <style lang="scss" scoped></style>

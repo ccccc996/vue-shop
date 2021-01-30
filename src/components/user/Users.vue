@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import hub from '../../utils/hub'
 export default {
   data() {
     return {
@@ -52,6 +53,7 @@ export default {
   },
   created() {
     this.getUserList()
+    hub.$emit('saveNavState', '/users')
   },
   methods: {
     async getUserList() {
