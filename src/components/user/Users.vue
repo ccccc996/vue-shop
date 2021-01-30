@@ -86,7 +86,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="editDialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="editUserInfo">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -212,8 +212,24 @@ export default {
       this.editForm = res.data
       this.editDialogVisible = true
     },
-    editDialogClosed(){
+    editDialogClosed() {
       this.$refs.editFormRef.resetFields()
+    },
+    editUserInfo() {
+      this.$refs.editFormRef.validate(async (valid) => {
+        if (!valid) return
+        const { data: res } = await this.$http.put(`users/${this.editForm.id}`, {
+          email: this.editForm.email,
+          mobile: this.editForm.mobile
+        })
+        if (res.meta.status !== 200) return this.$message.error('更新用户信息失败')
+        // 关闭弹框
+        this.editDialogVisible = false
+        // 刷新用户列表
+        this.getUserList()
+        // 提示更新成功
+        this.$message.success('更新用户信息成功')
+      })
     }
   }
 }
