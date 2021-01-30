@@ -71,7 +71,7 @@
     </el-dialog>
 
     <!-- 编辑用户 -->
-    <el-dialog title="提示" :visible.sync="editDialogVisible" width="50%">
+    <el-dialog title="提示" :visible.sync="editDialogVisible" width="50%" @close="editDialogClosed">
       <!-- 弹框表单 -->
       <el-form ref="editFormRef" :model="editForm" :rules="editFormRules" label-width="70px">
         <el-form-item label="用户名">
@@ -211,6 +211,9 @@ export default {
       if (res.meta.status !== 200) return this.$message.error('获取用户信息失败')
       this.editForm = res.data
       this.editDialogVisible = true
+    },
+    editDialogClosed(){
+      this.$refs.editFormRef.resetFields()
     }
   }
 }
