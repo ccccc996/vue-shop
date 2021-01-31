@@ -44,7 +44,8 @@
     </el-card>
     <!-- 分配权限对话框 -->
     <el-dialog title="分配权限" :visible.sync="setRightDialogVisible" width="50%">
-      <span>这是一段信息</span>
+      <!-- 树形控件 -->
+      <el-tree :data="rightsList" :props="treeProps" show-checkbox default-expand-all node-key="id"></el-tree>
       <span slot="footer" class="dialog-footer">
         <el-button @click="setRightDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="setRightDialogVisible = false">确 定</el-button>
@@ -60,7 +61,11 @@ export default {
       rolesList: [],
       // 控制分配权限对话框的显示与隐藏
       setRightDialogVisible: false,
-      rightsList: []
+      rightsList: [],
+      treeProps: {
+        children: 'children',
+        label: 'authName'
+      }
     }
   },
   created() {
