@@ -11,7 +11,7 @@
       <el-table :data="rolesList" border stripe>
         <el-table-column type="expand">
           <template slot-scope="scope">
-            <el-row v-for="item1 in scope.row.children" :key="item1.id">
+            <el-row :class="['bdbottom', i1 === 0 ? 'bdtop' : '', 'vcenter']" v-for="(item1, i1) in scope.row.children" :key="item1.id">
               <!-- 渲染一级权限 -->
               <el-col :span="5">
                 <el-tag>{{ item1.authName }}</el-tag>
@@ -19,7 +19,7 @@
               </el-col>
               <!-- 渲染二级权限 -->
               <el-col :span="19">
-                <el-row v-for="item2 in item1.children" :key="item2.id">
+                <el-row :class="[i2 === 0 ? '' : 'bdtop', 'vcenter']" v-for="(item2, i2) in item1.children" :key="item2.id">
                   <el-col :span="6">
                     <el-tag type="success">{{ item2.authName }}</el-tag>
                     <i class="el-icon-caret-right"></i>
@@ -66,4 +66,18 @@ export default {
 }
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.el-tag {
+  margin: 7px;
+}
+.bdtop {
+  border-top: 1px solid #eee;
+}
+.bdbottom {
+  border-bottom: 1px solid #eee;
+}
+.vcenter {
+  display: flex;
+  align-items: center;
+}
+</style>
