@@ -36,17 +36,19 @@
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryInfo.pagenum" :page-sizes="[3, 5, 10, 15]" :page-size="queryInfo.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total"> </el-pagination>
     </el-card>
     <!-- 添加分类弹框 -->
-    <el-dialog title="提示" :visible.sync="addCateDialogVisible" width="50%">
+    <el-dialog title="提示" :visible.sync="addCateDialogVisible" width="50%" @close="addCateDialogClosed">
       <!-- 添加分类表单 -->
       <el-form ref="addCateFormRef" :model="addCateForm" :rules="addCateFormRules" label-width="100px">
         <el-form-item label="分类名称：" prop="cat_name">
           <el-input v-model="addCateForm.cat_name"></el-input>
         </el-form-item>
-        <el-form-item label="父级分类："> </el-form-item>
+        <el-form-item label="父级分类：">
+          <el-cascader v-model="selectedKeys" :options="parentCateList" :props="cascaderProps" @change="parentCateChanged" class="el-cascader"></el-cascader>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="addCateDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addCateDialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="addCate">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -98,7 +100,17 @@ export default {
       addCateFormRules: {
         cat_name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }]
       },
-      parentCateList: []
+      parentCateList: [],
+      // 指定级联选择器的配置对象
+      cascaderProps: {
+        value: 'cat_id',
+        label: 'cat_name',
+        children: 'children',
+        expandTrigger: 'hover',
+        checkStrictly: true
+      },
+      // 选中的父级分类的 ID 数组
+      selectedKeys: []
     }
   },
   created() {
@@ -144,6 +156,34 @@ export default {
       if (res.meta.status !== 200) return this.$message.error('获取父级分类数据失败')
       // 存一下
       this.parentCateList = res.data
+      console.log(this.parentCateList, 1)
+    },
+    // 选择项发生变化会触发的函数
+    parentCateChanged() {
+      //   console.log(this.selectedKeys, 233)
+      // 如果 selectedKeys 数组的 length 大于 0，证明选中了父级分类
+      if (this.selectedKeys.length > 0) {
+        // 父级分类的 ID
+        this.addCateForm.cat_pid = this.selectedKeys[this.selectedKeys.length - 1]
+        // 为当前分类的等级赋值
+        this.addCateForm.cat_level = this.selectedKeys.length
+      } else {
+        this.addCateForm.cat_pid = 0
+        this.addCateForm.cat_level = 0
+      }
+    },
+    // 点击按钮添加新的分类
+    addCate() {
+      console.log(this.addCateForm)
+      // this.addCateDialogVisible = false
+    },
+    addCateDialogClosed() {
+      this.$refs.addCateFormRef.resetFields()
+      // 选择到的父分类 ID
+      this.selectedKeys = []
+      // 准备提交到后台的分类等级和分类 ID
+      this.addCateForm.cat_level = 0
+      this.addCateForm.cat_pid = 0
     }
   }
 }
@@ -152,5 +192,8 @@ export default {
 <style lang="less" scoped>
 .treeTable {
   margin-top: 15px;
+}
+.el-cascader {
+  width: 100%;
 }
 </style>
