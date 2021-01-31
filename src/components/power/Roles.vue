@@ -15,9 +15,20 @@
               <!-- 渲染一级权限 -->
               <el-col :span="5">
                 <el-tag>{{ item1.authName }}</el-tag>
+                <i class="el-icon-caret-right"></i>
               </el-col>
               <!-- 渲染二级权限 -->
-              <el-col :span="19"></el-col>
+              <el-col :span="19">
+                <el-row v-for="item2 in item1.children" :key="item2.id">
+                  <el-col :span="6">
+                    <el-tag type="success">{{ item2.authName }}</el-tag>
+                    <i class="el-icon-caret-right"></i>
+                  </el-col>
+                  <el-col :span="18">
+                    <el-tag type="warning" v-for="item3 in item2.children" :key="item3.id">{{ item3.authName }}</el-tag>
+                  </el-col>
+                </el-row>
+              </el-col>
             </el-row>
           </template>
         </el-table-column>
