@@ -14,18 +14,26 @@
         </el-col>
       </el-row>
       <!-- 表格区域 -->
-      <tree-table :expand-type="false" :data="catelist" :columns="columns" :selection-type="false" show-index index-text="#" border :show-row-hover="false">
+      <tree-table :expand-type="false" :data="catelist" :columns="columns" :selection-type="false" show-index index-text="#" border :show-row-hover="false" class="treeTable">
+        <!-- 是否有效区域 -->
         <template slot="isok" slot-scope="scope">
           <i class="el-icon-success" v-if="scope.row.cat_deleted === false" style="color: lightgreen;"></i>
           <i class="el-icon-error" v-else style="color: red;"></i>
         </template>
+        <!-- 表格排序区域 -->
         <template slot="order" slot-scope="scope">
           <el-tag size="mini" v-if="scope.row.cat_level === 0">一级</el-tag>
           <el-tag size="mini" type="success" v-else-if="scope.row.cat_level === 1">二级</el-tag>
           <el-tag size="mini" type="warning" v-else>三级</el-tag>
         </template>
+        <!-- 操作区域 -->
+        <template slot="opt">
+          <el-button type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
+          <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
+        </template>
       </tree-table>
       <!-- 分页区域 -->
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryInfo.pagenum" :page-sizes="[3, 5, 10, 15]" :page-size="queryInfo.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total"> </el-pagination>
     </el-card>
   </div>
 </template>
@@ -83,9 +91,23 @@ export default {
       // 为总数据条数赋值
       this.total = res.data.total
       console.log(this.catelist)
+    },
+    // 监听 pagesize 变化
+    handleSizeChange(newSize) {
+      this.queryInfo.pagesize = newSize
+      this.getCateList()
+    },
+    // 监听 pagenum 变化
+    handleCurrentChange(newPage) {
+      this.queryInfo.pagenum = newPage
+      this.getCateList()
     }
   }
 }
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.treeTable {
+  margin-top: 15px;
+}
+</style>
