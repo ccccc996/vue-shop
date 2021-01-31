@@ -97,7 +97,8 @@ export default {
       },
       addCateFormRules: {
         cat_name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }]
-      }
+      },
+      parentCateList: []
     }
   },
   created() {
@@ -129,7 +130,20 @@ export default {
       this.getCateList()
     },
     showAddCateDialog() {
+      // 获取父级分类的数据
+      this.getParentCateList()
       this.addCateDialogVisible = true
+    },
+    // 获取父级分类的列表
+    async getParentCateList() {
+      const { data: res } = await this.$http.get('categories', {
+        params: {
+          type: 2 // 获取前两级的所有分类
+        }
+      })
+      if (res.meta.status !== 200) return this.$message.error('获取父级分类数据失败')
+      // 存一下
+      this.parentCateList = res.data
     }
   }
 }
