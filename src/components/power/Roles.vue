@@ -14,18 +14,18 @@
             <el-row :class="['bdbottom', i1 === 0 ? 'bdtop' : '', 'vcenter']" v-for="(item1, i1) in scope.row.children" :key="item1.id">
               <!-- 渲染一级权限 -->
               <el-col :span="5">
-                <el-tag closable>{{ item1.authName }}</el-tag>
+                <el-tag closable @close="removeRightById(scope.row, item1.id)">{{ item1.authName }}</el-tag>
                 <i class="el-icon-caret-right"></i>
               </el-col>
               <!-- 渲染二级权限 -->
               <el-col :span="19">
                 <el-row :class="[i2 === 0 ? '' : 'bdtop', 'vcenter']" v-for="(item2, i2) in item1.children" :key="item2.id">
                   <el-col :span="6">
-                    <el-tag type="success" closable>{{ item2.authName }}</el-tag>
+                    <el-tag type="success" closable @close="removeRightById(scope.row, item2.id)">{{ item2.authName }}</el-tag>
                     <i class="el-icon-caret-right"></i>
                   </el-col>
                   <el-col :span="18">
-                    <el-tag type="warning" v-for="item3 in item2.children" :key="item3.id" closable @close="removeRightById()">{{ item3.authName }}</el-tag>
+                    <el-tag type="warning" v-for="item3 in item2.children" :key="item3.id" closable @close="removeRightById(scope.row, item3.id)">{{ item3.authName }}</el-tag>
                   </el-col>
                 </el-row>
               </el-col>
@@ -62,7 +62,7 @@ export default {
       this.rolesList = res.data
       // console.log(this.rolesList)
     },
-    async removeRightById() {
+    async removeRightById(Role, RightId) {
       const confirmResult = await this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -70,8 +70,10 @@ export default {
       }).catch((err) => err)
 
       if (confirmResult !== 'confirm') return this.$message.info('取消了删除')
-
-      console.log('确认了删除')
+      // console.log('确认了删除')
+      const { data: res } = await this.$http.delete(`roles/${Role.id}/rights/${RightId}`)
+      if (res.meta.status !== 200) return this.$message.error('删除权限失败')
+      Role.children = res.data
     }
   }
 }
