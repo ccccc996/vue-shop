@@ -13,11 +13,16 @@
       <!-- 选择商品分类区域 -->
       <el-row class="cat_opt">
         <el-col>
-          <span>选择商品分类:</span>
+          <span>选择商品分类：</span>
           <!-- 选择商品分类的级联选择框 -->
           <el-cascader :options="catelist" :props="cateProps" v-model="selectedCateKeys" @change="handleChange"></el-cascader>
         </el-col>
       </el-row>
+      <!-- tab 标签 -->
+      <el-tabs v-model="activeName" @tab-click="handleTabClick">
+        <el-tab-pane label="动态参数" name="first">动态参数</el-tab-pane>
+        <el-tab-pane label="静态属性" name="second">静态属性</el-tab-pane>
+      </el-tabs>
     </el-card>
   </div>
 </template>
@@ -36,7 +41,9 @@ export default {
         checkStrictly: true
       },
       // 级联选择框双向绑定到的数组
-      selectedCateKeys: []
+      selectedCateKeys: [],
+      // 被激活的页签的名称
+      activeName: 'first'
     }
   },
   created() {
@@ -58,6 +65,10 @@ export default {
       }
       // 选中的是 3 级分类
       console.log(this.selectedCateKeys)
+    },
+    // Tab 页签点击时触发
+    handleTabClick() {
+      console.log(this.activeName)
     }
   }
 }
