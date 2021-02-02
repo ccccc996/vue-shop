@@ -30,9 +30,9 @@
               <template slot-scope="scope">
                 <el-tag v-for="(item, i) in scope.row.attr_vals" :key="i" closable>{{ item }}</el-tag>
                 <!-- 输入的文本框 -->
-                <el-input class="input-new-tag" v-if="inputVisible" v-model="inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm"></el-input>
+                <el-input class="input-new-tag" v-if="scope.row.inputVisible" v-model="scope.row.inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm(scope.row)" @blur="handleInputConfirm(scope.row)"></el-input>
                 <!-- 添加的按钮 -->
-                <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
+                <el-button v-else class="button-new-tag" size="small" @click="showInput(scope.row)">+ New Tag</el-button>
               </template>
             </el-table-column>
             <!-- 索引列 -->
@@ -79,8 +79,8 @@
         <el-button type="primary" @click="addParams">确 定</el-button>
       </span>
     </el-dialog>
-    <!-- 添加动态参数/静态属性对话框 -->
-    <el-dialog :title="'添加' + titleText" :visible.sync="editDialogVisible" width="50%" @close="editDialogClosed">
+    <!-- 修改参数对话框 -->
+    <el-dialog :title="'修改' + titleText" :visible.sync="editDialogVisible" width="50%" @close="editDialogClosed">
       <!-- 添加参数的对话框 -->
       <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="100px">
         <el-form-item :label="titleText" prop="attr_name">
@@ -131,11 +131,11 @@ export default {
       editForm: {},
       editFormRules: {
         attr_name: [{ required: true, message: '请输入参数名称', trigger: 'blur' }]
-      },
+      }
       // 控制按钮与文本框的切换显示
-      inputVisible: false,
+      // inputVisible: false,
       // 文本框中输入的内容
-      inputValue: ''
+      // inputValue: ''
     }
   },
   created() {
@@ -146,7 +146,7 @@ export default {
       const { data: res } = await this.$http.get('categories')
       if (res.meta.status !== 200) return this.$message.error('获取商品分类失败')
       this.catelist = res.data
-      console.log(this.catelist)
+      //   console.log(this.catelist)
     },
     // 级联选择框选中项变化会触发
     handleChange() {
@@ -163,7 +163,7 @@ export default {
         this.selectedCateKeys = []
         return false
       }
-      // 选中的是 3 级分类
+      // 选中的是 3 级分类，根据所选分类的 ID，和当前所处的面板，获取对应的参数
       // console.log(this.selectedCateKeys)
       const { data: res } = await this.$http.get(`categories/${this.cateId}/attributes`, {
         params: {
@@ -173,6 +173,10 @@ export default {
       // 对参数下的可选项数据进行加工
       res.data.forEach((item) => {
         item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : []
+        // 控制文本框的显示与隐藏
+        item.inputVisible = false
+        // 文本框中输入的值
+        item.inputValue = ''
       })
       if (res.meta.status !== 200) {
         return this.$message.error('获取参数列表失败')
@@ -190,7 +194,7 @@ export default {
     },
     addParams() {
       this.$refs.addFormRef.validate(async (valid) => {
-        if (!valid) return
+        if (!valid) return false
         const { data: res } = await this.$http.post(`categories/${this.cateId}/attributes`, {
           attr_name: this.addForm.attr_name,
           attr_sel: this.activeName,
@@ -250,10 +254,21 @@ export default {
       this.getParamsData()
     },
     // 文本框失去焦点或 Enter
-    handleInputConfirm() {},
+    handleInputConfirm(row) {
+      if (row.inputValue.trim().length === 0) {
+        row.inputValue = ''
+        row.inputVisible = false
+        return false
+      }
+    },
     // 点击按钮展示输入文本框
-    showInput() {
-      this.inputVisible = true
+    showInput(row) {
+      row.inputVisible = true
+      // 让文本框自动获得焦点
+      // $nextTick: 当页面上的元素被重新渲染后，才会执行回调函数中的代码
+      this.$nextTick(() => {
+        this.$refs.saveTagInput.$refs.input.focus()
+      })
     }
   },
   computed: {
