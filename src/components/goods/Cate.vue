@@ -174,8 +174,16 @@ export default {
     },
     // 点击按钮添加新的分类
     addCate() {
-      console.log(this.addCateForm)
+      // console.log(this.addCateForm)
       // this.addCateDialogVisible = false
+      this.$refs.addCateFormRef.validate(async (valid) => {
+        if (!valid) return
+        const { data: res } = await this.$http.post('categories', this.addCateForm)
+      })
+      // console.log(data)
+      if (res.meta.status !== 201) return this.$message.error('添加数据失败')
+      this.getCateList()
+      this.addCateDialogVisible = false
     },
     addCateDialogClosed() {
       this.$refs.addCateFormRef.resetFields()
