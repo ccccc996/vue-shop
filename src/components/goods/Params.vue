@@ -26,7 +26,11 @@
           <!-- 动态参数表格 -->
           <el-table :data="manyTableData" border stripe>
             <!-- 展开行的操作 -->
-            <el-table-column type="expand"></el-table-column>
+            <el-table-column type="expand">
+              <template slot-scope="scope">
+                <el-tag v-for="(item, i) in scope.row.attr_vals" :key="i" closable>{{ item }}</el-tag>
+              </template>
+            </el-table-column>
             <!-- 索引列 -->
             <el-table-column type="index"></el-table-column>
             <el-table-column label="参数名称" prop="attr_name"></el-table-column>
@@ -158,6 +162,10 @@ export default {
           sel: this.activeName
         }
       })
+      // 对参数下的可选项数据进行加工
+      res.data.forEach((item) => {
+        item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : []
+      })
       if (res.meta.status !== 200) {
         return this.$message.error('获取参数列表失败')
       }
@@ -177,7 +185,8 @@ export default {
         if (!valid) return
         const { data: res } = await this.$http.post(`categories/${this.cateId}/attributes`, {
           attr_name: this.addForm.attr_name,
-          attr_sel: this.activeName
+          attr_sel: this.activeName,
+          attr_vals: this.editForm.attr_vals // !把之前的带上，防止编辑修改之后把之前的数据清空
         })
         if (res.meta.status !== 201) return this.$message.error('添加参数失败')
         this.$message.success('添加参数成功')
@@ -192,6 +201,7 @@ export default {
           attr_sel: this.activeName
         }
       })
+
       if (res.meta.status !== 200) return this.$message.error('获取参数信息失败')
       this.editForm = res.data
       this.editDialogVisible = true
@@ -222,13 +232,11 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).catch( err => err)
-      if(confirmResult !== 'confirm') return this.$message.info('已取消删除')
-      const {data:res} = await this.$http.delete(
-        `categories/${this.cateId}/attributes/${attrId}`
-      )
-      if(res.meta.status !== 200){
-          return this.$message.error('删除参数失败')
+      }).catch((err) => err)
+      if (confirmResult !== 'confirm') return this.$message.info('已取消删除')
+      const { data: res } = await this.$http.delete(`categories/${this.cateId}/attributes/${attrId}`)
+      if (res.meta.status !== 200) {
+        return this.$message.error('删除参数失败')
       }
       this.$message.success('删除参数成功')
       this.getParamsData()
@@ -265,5 +273,8 @@ export default {
 <style lang="less" scoped>
 .cat_opt {
   margin: 15px 0;
+}
+.el-tag {
+  margin: 5px;
 }
 </style>
