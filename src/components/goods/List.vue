@@ -16,7 +16,7 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary">添加商品</el-button>
+          <el-button type="primary" @click="toAddPage">添加商品</el-button>
         </el-col>
       </el-row>
 
@@ -70,7 +70,7 @@ export default {
         params: this.queryInfo
       })
       if (res.meta.status !== 200) return this.$message.error('获取商品列表失败')
-    //   this.$message.success('获取商品列表成功')
+      //   this.$message.success('获取商品列表成功')
       this.goodsList = res.data.goods
       this.total = res.data.total
     },
@@ -94,6 +94,9 @@ export default {
       if (res.meta.status !== 200) return this.$message.error('删除失败')
       this.$message.success('删除成功')
       this.getGoodsList()
+    },
+    toAddPage() {
+      this.$router.push('/goods/add')
     }
   }
 }

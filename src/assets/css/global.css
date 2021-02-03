@@ -25,4 +25,8 @@ body,
 }
 .el-scrollbar__wrap {
   overflow-x: hidden;
-} 
+}
+
+.el-steps {
+  margin: 15px 0;
+}
