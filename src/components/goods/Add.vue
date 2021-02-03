@@ -21,7 +21,7 @@
       </el-steps>
       <!-- tab区域 -->
       <el-form ref="addFormRef" :model="addForm" :rules="addFormRules" label-width="80px" label-position="top">
-        <el-tabs :tab-position="tabPosition">
+        <el-tabs :tab-position="tabPosition" v-model="activeIndex" :before-leave="beforeTabLeave" @tab-click="tabClicked">
           <el-tab-pane label="基本信息" name="0">
             <el-form-item label="商品名称" prop="goods_name">
               <el-input v-model="addForm.goods_name"></el-input>
@@ -39,7 +39,13 @@
               <el-cascader v-model="addForm.goods_cat" :options="cateList" :props="cateProps" @change="handleChange"></el-cascader>
             </el-form-item>
           </el-tab-pane>
-          <el-tab-pane label="商品参数" name="1">商品参数</el-tab-pane>
+          <el-tab-pane label="商品参数" name="1">
+            <el-form-item :label="item.attr_name" v-for="item in manyTableData" :key="item.attr_id">
+              <el-checkbox-group v-model="item.attr_vals">
+                <el-checkbox :label="cb" v-for="(cb, i) in item.attr_vals" :key="i" border></el-checkbox>
+              </el-checkbox-group>
+            </el-form-item>
+          </el-tab-pane>
           <el-tab-pane label="商品属性" name="2">商品属性</el-tab-pane>
           <el-tab-pane label="商品图片" name="3">商品图片</el-tab-pane>
           <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
@@ -59,7 +65,8 @@ export default {
         goods_name: '',
         goods_price: 0,
         goods_number: 0,
-        goods_weight: 0
+        goods_weight: 0,
+        goods_cat: [{ required: true, message: '请输入活动名称', trigger: 'blur' }]
       },
       addFormRules: {
         goods_name: [{ required: true, message: '请输入活动名称', trigger: 'blur' }],
@@ -74,23 +81,58 @@ export default {
         label: 'cat_name',
         children: 'children',
         expandTrigger: 'hover'
-      }
+      },
+      manyTableData: []
     }
   },
   created() {
     this.getCateList()
   },
+
   methods: {
     async getCateList() {
       const { data: res } = await this.$http.get('categories')
       if (res.meta.status !== 200) return this.$message.error('获取商品分类失败')
       this.cateList = res.data
-    //   console.log(this.cateList)
+      //   console.log(this.cateList)
     },
     handleChange() {
       if (this.addForm.goods_cat.length !== 3) {
         this.addForm.goods_cat = []
       }
+    },
+    beforeTabLeave(activeName, oldActiveName) {
+      if (oldActiveName === '0' && this.addForm.goods_cat.length !== 3) {
+        this.$message.error('请选择商品分类')
+        return false
+      }
+    },
+    async tabClicked() {
+      // 当激活这个索引
+      // console.log(this.activeIndex)
+      if (this.activeIndex === '1') {
+        const { data: res } = await this.$http.get(`categories/${this.cateId}/attributes`, {
+          params: {
+            sel: 'many'
+          }
+        })
+        // console.log(res.data)
+        if (res.meta.status !== 200) return this.$message.error('获取动态参数失败')
+        this.manyTableData = res.data
+        // console.log(this.manyTableData)
+        res.data.forEach((item) => {
+          item.attr_vals = item.attr_vals === 0 ? [] : item.attr_vals.split(' ')
+        })
+      }
+    }
+  },
+  computed: {
+    // 三级分类的 ID
+    cateId() {
+      if (this.addForm.goods_cat.length === 3) {
+        return this.addForm.goods_cat[2]
+      }
+      return null
     }
   }
 }
