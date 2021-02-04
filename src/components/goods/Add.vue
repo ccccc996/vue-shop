@@ -51,11 +51,19 @@
               <el-input v-model="item.attr_vals"></el-input>
             </el-form-item>
           </el-tab-pane>
-          <el-tab-pane label="商品图片" name="3">商品图片</el-tab-pane>
+          <el-tab-pane label="商品图片" name="3">
+            <el-upload :action="uploadURL" :on-preview="handlePreview" :on-remove="handleRemove" list-type="picture" :headers="headerObj" :on-success="handleSuccess">
+              <el-button size="small" type="primary">点击上传</el-button>
+            </el-upload>
+          </el-tab-pane>
           <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
         </el-tabs>
       </el-form>
     </el-card>
+    <!-- 预览照片弹出框 -->
+    <el-dialog title="图片预览" :visible.sync="PreviewVisible" width="50%">
+      <img class="PreviewImg" :src="PreviewPath" alt="" />
+    </el-dialog>
   </div>
 </template>
 
@@ -70,7 +78,9 @@ export default {
         goods_price: 0,
         goods_number: 0,
         goods_weight: 0,
-        goods_cat: [{ required: true, message: '请输入活动名称', trigger: 'blur' }]
+        goods_cat: [{ required: true, message: '请输入活动名称', trigger: 'blur' }],
+        // 图片的数组
+        pics: []
       },
       addFormRules: {
         goods_name: [{ required: true, message: '请输入活动名称', trigger: 'blur' }],
@@ -89,7 +99,14 @@ export default {
       // 动态参数数据
       manyTableData: [],
       // 静态属性数据
-      onlyTableData: []
+      onlyTableData: [],
+      uploadURL: 'http://127.0.0.1:8888/api/private/v1/upload',
+      // 添加请求头
+      headerObj: {
+        Authorization: window.sessionStorage.getItem('token')
+      },
+      PreviewVisible: false,
+      PreviewPath: ''
     }
   },
   created() {
@@ -140,6 +157,33 @@ export default {
         this.onlyTableData = res.data
         console.log(this.onlyTableData)
       }
+    },
+    // 处理图片预览函数
+    handlePreview(file) {
+      console.log(file)
+      this.PreviewPath = file.response.data.url
+      this.PreviewVisible = true
+    },
+    // 处理图片删除函数
+    handleRemove(file) {
+      // console.log(file)
+      // 获取将要删除的图片的临时路径
+      const filePath = file.response.data.tmp_path
+      // 从 pics 数组中，找到这个图片对应的索引值
+      const i = this.addForm.pics.findIndex((x) => x.pic === filePath)
+      // 调用数组的 splice 方法，把图片信息对象从 pics 数组中移出
+      this.addForm.pics.splice(i, 1)
+      // console.log(this.addForm)
+    },
+    // 图片上传成功
+    handleSuccess(response) {
+      // console.log(response)
+      // 拼接得到的图片信息对象
+      const picInfo = {
+        pic: response.data.tmp_path
+      }
+      this.addForm.pics.push(picInfo)
+      // console.log(this.addForm)
     }
   },
   computed: {
@@ -154,4 +198,8 @@ export default {
 }
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.PreviewImg {
+  width: 100%;
+}
+</style>
