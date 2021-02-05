@@ -20,9 +20,9 @@
         <el-table-column prop="order_number" label="订单编号"> </el-table-column>
         <el-table-column prop="order_price" label="订单价格"> </el-table-column>
         <el-table-column prop="order_status" label="是否付款">
-          <template>
-            <el-tag type="success">已付款</el-tag>
-            <el-tag type="danger">未付款</el-tag>
+          <template slot-scope="scope">
+            <el-tag type="success" v-if="scope.row.pay_status === 1">已付款</el-tag>
+            <el-tag type="danger" v-else>未付款</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="是否发货" prop="is_send"></el-table-column>
@@ -63,7 +63,7 @@ export default {
       const { data: res } = await this.$http.get('orders', {
         params: this.queryInfo
       })
-    //   console.log(res)
+      //   console.log(res)
       if (res.meta.status !== 200) return this.$message.error('获取订单列表失败')
       this.total = res.data.total
       this.orderlist = res.data.goods
